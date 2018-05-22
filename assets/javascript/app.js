@@ -22,15 +22,22 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 //Listen for value events
-database.ref('/chat').on('child_added', function(childsnapshot){
+database.ref('/players').on('value', function(snapshot){
+    //Listen event for players
+
+    //DEBUG CODE REMOVE WHEN DONE
+    console.log(snapshot.val());
+});
+
+database.ref('/chat').on('child_added', function(chatsnapshot){
     //Listen event for chat messages
     if (messageList.text() == ""){
         //Account for the first blank entry
-        messageList.text(`${childsnapshot.val().playerName}: ${childsnapshot.val().message}`);
+        messageList.text(`${chatsnapshot.val().playerName}: ${chatsnapshot.val().message}`);
     }
     else{
         var previousText = messageList.text();
-        messageList.text(`${previousText}\n${childsnapshot.val().playerName}: ${childsnapshot.val().message}`);
+        messageList.text(`${previousText}\n${chatsnapshot.val().playerName}: ${chatsnapshot.val().message}`);
     }
     //auto scroll to bottom of textarea, show latest chat
     messageList.scrollTop(messageList[0].scrollHeight);
@@ -41,6 +48,7 @@ database.ref('/chat').on('child_added', function(childsnapshot){
 
 //Functions
 function sendChatMessage(message){
+    //Function to send messages to database, change will trigger listen 'chat' event
     var ref = firebase.database().ref("/chat");
     ref.push().set({
         playerName: playerName,
@@ -61,6 +69,15 @@ $(function(){
         $("#gameInfo").empty();
         $("#gameInfo").text("Hello: " + playerName);
 
+        var playerDataRef = database.ref('/players').child('/player1');
+        playerDataRef.set({
+            playerName: playerName,
+            score: 0
+        });
+
+        playerDataRef.onDisconnect().update({
+            score: "Offline"
+        });
         /*
         //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
         var key = database.ref().child('players').push().key
