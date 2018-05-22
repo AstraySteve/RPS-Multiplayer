@@ -19,9 +19,21 @@
         <!--TEMP HTML LAYOUT-->
         <h1>Rock Paper Scissors</h1>
         <form>
-            <input type="text" placeholder="Name" id="username">
+            <input type="text" placeholder="Name" id="playerName">
             <input type="submit" value="Start" id="addPlayer">
         </form>
+        <br>
+        <form>
+            <div class="form-group">
+                <textarea id="messageList" class="form-control" readonly></textarea>
+                <label>Username: </label>
+                <input id="username" type="text"/>
+                <label>Message: </label>
+                <input id="message" type="text"/>
+                <button id="submitMessage" type="submit">Submit</button>
+            </div>
+        </form>
+
         <!--Javascript-->
         <script type="text/javascript" src="assets/javascript/app.js"></script>
     </body>

@@ -6,6 +6,7 @@
 
 //Global Variables
 var turn = 1; // Variable keep track of game phase
+var messageList = $("#messageList");
 
 //Initialize Firebase
 var config = {
@@ -27,7 +28,21 @@ database.ref().on("value", function(snapshot){
     
 });
 
+database.ref('/chat').on('child_added', function(childsnapshot){
+    //everysigle time a child is added, this will fire. snapshot will give the most recent one added
+    console.log(childsnapshot.val());
+    var previousText = messageList.text();
+    messageList.text(`${previousText} \n ${childsnapshot.val().username}: ${childsnapshot.val().message}`);
+});
+
 //Functions
+function sendChatMessage(username, message){
+    var ref = firebase.database().ref("/chat");
+    ref.push().set({
+        username:username,
+        message: message
+    });
+}
 
 //Main
 //Shorthand for $(document).ready(function(){...});
@@ -36,8 +51,8 @@ $(function(){
     //Click event for username submit
     $("#addPlayer").on("click", function(){
         event.preventDefault();
-        var username = $("#username").val();
-        console.log(username);
+        var playerName = $("#playerName").val();
+        console.log(playerName);
 
         //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
         var key = database.ref().child('players').push().key
@@ -62,6 +77,15 @@ $(function(){
         });
         //TEST CODE END
 
+    });
+
+    //Click event for message field submit
+    $("#submitMessage").on("click", function(event){
+        event.preventDefault();
+        //console.log(this);
+        var username = $("#username").val();
+        var message = $("#message").val();
+        sendChatMessage(username, message);
     });
 });
 
