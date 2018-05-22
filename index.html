@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!--
+        Steven Tran
+        Assignment 7, 2018
+        UofT SCS Coding Bootcamp
+    -->
     <head>
         <!--Required meta tags-->
         <meta charset="UTF-8">
@@ -16,23 +21,41 @@
         <title>RPS-Multiplayer</title>
     </head>
     <body>
-        <!--TEMP HTML LAYOUT-->
-        <h1>Rock Paper Scissors</h1>
-        <form>
-            <input type="text" placeholder="Name" id="playerName">
-            <input type="submit" value="Start" id="addPlayer">
-        </form>
-        <br>
-        <form>
-            <div class="form-group">
-                <textarea id="messageList" class="form-control" readonly></textarea>
-                <label>Username: </label>
-                <input id="username" type="text"/>
-                <label>Message: </label>
-                <input id="message" type="text"/>
-                <button id="submitMessage" type="submit">Submit</button>
+        <header id="titleBar">
+            <h1 id="mainHeader">Rock Paper Scissors Multiplayer</h1>
+        </header>
+
+        <!--Game Info Area-->
+        <section class="container-fluid">
+            <div class="row justify-content-center">
+                <div id="gameInfo" class="col-auto">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" placeholder="Name" id="playerName"/>
+                            <input type="submit" value="Start" id="addPlayer">
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </section>
+        <section class="container">
+            <!--GAME Area-->
+            <div class="row">
+                <!--TODO RPS INTERFACE HERE-->
+            </div>
+            <!--Message board-->
+            <div class="row justify-content-center">
+                <div id="messageBoard" class="col-12 col-md-8">
+                    <form>
+                        <div class="form-group">
+                            <textarea readonly id="messageList" class="form-control"></textarea>
+                            <input type="text" placeholder="Message" id="message" class="form-control" />
+                            <button type="submit" id="submitMessage" >Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
 
         <!--Javascript-->
         <script type="text/javascript" src="assets/javascript/app.js"></script>

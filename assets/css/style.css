@@ -1,0 +1,15 @@
+/*
+    Steven Tran
+    Assignment 7, 2018
+    UofT SCS Coding Bootcamp
+*/
+
+#titleBar{
+    text-align: center;
+    border: 4px inset gray;
+    margin-bottom: 3vh;
+}
+
+#messageList{
+    height: 20vh;
+}

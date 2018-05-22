@@ -7,6 +7,7 @@
 //Global Variables
 var turn = 1; // Variable keep track of game phase
 var messageList = $("#messageList");
+var playerName = "";
 
 //Initialize Firebase
 var config = {
@@ -21,25 +22,28 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 //Listen for value events
-database.ref().on("value", function(snapshot){
-    /*
-        TODO: refer to values on db structure and perform html hookups
-    */
-    
-});
-
 database.ref('/chat').on('child_added', function(childsnapshot){
-    //everysigle time a child is added, this will fire. snapshot will give the most recent one added
-    console.log(childsnapshot.val());
-    var previousText = messageList.text();
-    messageList.text(`${previousText} \n ${childsnapshot.val().username}: ${childsnapshot.val().message}`);
+    //Listen event for chat messages
+    if (messageList.text() == ""){
+        //Account for the first blank entry
+        messageList.text(`${childsnapshot.val().playerName}: ${childsnapshot.val().message}`);
+    }
+    else{
+        var previousText = messageList.text();
+        messageList.text(`${previousText}\n${childsnapshot.val().playerName}: ${childsnapshot.val().message}`);
+    }
+    //auto scroll to bottom of textarea, show latest chat
+    messageList.scrollTop(messageList[0].scrollHeight);
+
+    //DEBUG CODE REMOVE WHEN DONE
+    //console.log(childsnapshot.val());
 });
 
 //Functions
-function sendChatMessage(username, message){
+function sendChatMessage(message){
     var ref = firebase.database().ref("/chat");
     ref.push().set({
-        username:username,
+        playerName: playerName,
         message: message
     });
 }
@@ -51,14 +55,18 @@ $(function(){
     //Click event for username submit
     $("#addPlayer").on("click", function(){
         event.preventDefault();
-        var playerName = $("#playerName").val();
+        playerName = $("#playerName").val();
         console.log(playerName);
 
+        $("#gameInfo").empty();
+        $("#gameInfo").text("Hello: " + playerName);
+
+        /*
         //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
         var key = database.ref().child('players').push().key
         console.log(key);
         var updates = {};
-        updates['players/'+key] = {username: "hello world"};
+        updates['players/'+key] = {username: playerName};
         database.ref().update(updates);
         
         database.ref().on("value", function(snapshot) {
@@ -75,7 +83,7 @@ $(function(){
                 console.log("cannot find player1");
             }
         });
-        //TEST CODE END
+        //TEST CODE END*/
 
     });
 
@@ -83,12 +91,15 @@ $(function(){
     $("#submitMessage").on("click", function(event){
         event.preventDefault();
         //console.log(this);
-        var username = $("#username").val();
         var message = $("#message").val();
-        sendChatMessage(username, message);
+        sendChatMessage(message);
+
+        //Clear chat fields
+        $("#message").val("");
     });
 });
 
+/*
 //TEMP CODE TEST CODE REMOVE WHEN DONE
 database.ref('players/player1').set({
     username: "bob",
@@ -97,6 +108,4 @@ database.ref('players/player1').set({
 database.ref('players/player2').set({
     username: "billy",
 });
-
-
-
+*/
