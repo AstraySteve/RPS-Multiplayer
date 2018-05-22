@@ -5,6 +5,7 @@
 */
 
 //Global Variables
+var turn = 1; // Variable keep track of game phase
 
 //Initialize Firebase
 var config = {
@@ -18,4 +19,46 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
+//Functions
+
 //Main
+//Shorthand for $(document).ready(function(){...});
+$(function(){
+
+    //Click event for username submit
+    $("#addPlayer").on("click", function(){
+        event.preventDefault();
+        var username = $("#username").val();
+        console.log(username);
+
+        //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
+        database.ref().on("value", function(snapshot) {
+            if(snapshot.child("players").exists()){
+                console.log("players exists")
+            }
+            if(snapshot.child("player1").exists()){
+                console.log("player1 exist");
+            }
+            else if(snapshot.child("players").child("player1").exists()){
+                console.log("player1 exist nested");
+            }
+            else{
+                console.log("cannot find player1");
+            }
+        });
+        //TEST CODE END
+        
+    });
+});
+
+//TEMP CODE TEST CODE REMOVE WHEN DONE
+database.ref('players/player1').set({
+    username: "bob",
+});
+
+database.ref('players/player2').set({
+    username: "billy",
+});
+
+
+
