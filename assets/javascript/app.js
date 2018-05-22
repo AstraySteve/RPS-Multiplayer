@@ -19,6 +19,14 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 
+//Listen for value events
+database.ref().on("value", function(snapshot){
+    /*
+        TODO: refer to values on db structure and perform html hookups
+    */
+    
+});
+
 //Functions
 
 //Main
@@ -32,6 +40,12 @@ $(function(){
         console.log(username);
 
         //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
+        var key = database.ref().child('players').push().key
+        console.log(key);
+        var updates = {};
+        updates['players/'+key] = {username: "hello world"};
+        database.ref().update(updates);
+        
         database.ref().on("value", function(snapshot) {
             if(snapshot.child("players").exists()){
                 console.log("players exists")
@@ -47,7 +61,7 @@ $(function(){
             }
         });
         //TEST CODE END
-        
+
     });
 });
 
