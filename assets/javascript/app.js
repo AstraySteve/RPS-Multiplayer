@@ -29,19 +29,26 @@ database.ref('/players').on('value', function(snapshot){
     if (snapshot.child('player1').exists() && snapshot.child('player2').exists()){
         isFull = true;
         console.log("game full");
-        /* Run Game */
+
+        /* Run Game display both p1 and p2*/
     }
     else{
         isFull = false;
         if(snapshot.child('player1').exists()){
-            /*Make Player 2*/
+            /*Make Player 2 display player 1*/
             isPlayer1 = false;
         }
         else {
             /*Make Player 1*/
             isPlayer1 = true;
+            if(snapshot.child('player2').exists()){
+                /*display player2*/
+            }
+            else{
+                //Clears database if no players exists
+                database.ref().remove();
+            }
         }
-
     }
     //DEBUG CODE REMOVE WHEN DONE
     console.log(snapshot.val());
@@ -59,68 +66,59 @@ database.ref('/chat').on('child_added', function(chatsnapshot){
     }
     //auto scroll to bottom of textarea, show latest chat
     messageList.scrollTop(messageList[0].scrollHeight);
-
-    //DEBUG CODE REMOVE WHEN DONE
-    //console.log(childsnapshot.val());
 });
 
 //Functions
 function sendChatMessage(message){
     //Function to send messages to database, change will trigger listen 'chat' event
-    var ref = firebase.database().ref("/chat");
+    var ref = database.ref("/chat");
     ref.push().set({
         playerName: playerName,
         message: message
     });
 }
 
+function assignPlayer(){
+    //Function assigns player as either player 1 or 2
+    var key;
+    switch(isPlayer1){
+        case true:
+            key = "player1";
+            break;
+        case false:
+            key = "player2";
+    }
+
+    $("#gameInfo").text("Hello: " + playerName + "you are " + key);
+    var playerDataRef = database.ref('/players').child(key);
+    playerDataRef.set({
+        playerName: playerName,
+        win: 0,
+        loss: 0,
+        choice: ""
+    });
+    //Removes player data from database when client disconnect
+    playerDataRef.onDisconnect().remove();
+}
+
 //Main
 //Shorthand for $(document).ready(function(){...});
 $(function(){
-
     //Click event for username submit
     $("#addPlayer").on("click", function(){
         event.preventDefault();
         playerName = $("#playerName").val();
         //console.log(playerName);
-
         $("#gameInfo").empty();
-        if (isFull){
-            $("#gameInfo").text("Game Full!");
-        }
-        else{
-            var key;
-            switch(isPlayer1){
-                case true:
-                    console.log("creating player1");
-                    key = "player1";
-                    break;
-                case false:
-                    console.log("creating player2");
-                    key = "player2";
-            }
-            
-            $("#gameInfo").text("Hello: " + playerName);
-
-            var playerDataRef = database.ref('/players').child(key);
-            playerDataRef.set({
-                playerName: playerName,
-                score: 0
-            });
-            //Removes player data from database when client disconnect
-            playerDataRef.onDisconnect().remove();
-        }
+        assignPlayer();
     });
 
     //Click event for message field submit
     $("#submitMessage").on("click", function(event){
         event.preventDefault();
-
         var message = $("#message").val();
         sendChatMessage(message);
-
         //Clear chat fields
         $("#message").val("");
     });
 });
-
