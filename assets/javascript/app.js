@@ -97,8 +97,13 @@ function assignPlayer(){
         loss: 0,
         choice: ""
     });
+    sendChatMessage("Has joined the game.");
     //Removes player data from database when client disconnect
-    playerDataRef.onDisconnect().remove();
+    var newPost = database.ref().child('chat').push().key;
+    var updates = {};
+    updates['/chat/'+newPost] = {playerName: playerName, message: "Disconnected"};
+    updates['/players/'+key] = null;
+    database.ref().onDisconnect().update(updates);
 }
 
 //Main
