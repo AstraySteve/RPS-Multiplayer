@@ -8,6 +8,8 @@
 var turn = 1; // Variable keep track of game phase
 var messageList = $("#messageList");
 var playerName = "";
+var isFull = false; //Flag to check if game is full
+var isPlayer1 = true;
 
 //Initialize Firebase
 var config = {
@@ -24,7 +26,23 @@ var database = firebase.database();
 //Listen for value events
 database.ref('/players').on('value', function(snapshot){
     //Listen event for players
+    if (snapshot.child('player1').exists() && snapshot.child('player2').exists()){
+        isFull = true;
+        console.log("game full");
+        /* Run Game */
+    }
+    else{
+        isFull = false;
+        if(snapshot.child('player1').exists()){
+            /*Make Player 2*/
+            isPlayer1 = false;
+        }
+        else {
+            /*Make Player 1*/
+            isPlayer1 = true;
+        }
 
+    }
     //DEBUG CODE REMOVE WHEN DONE
     console.log(snapshot.val());
 });
@@ -64,50 +82,40 @@ $(function(){
     $("#addPlayer").on("click", function(){
         event.preventDefault();
         playerName = $("#playerName").val();
-        console.log(playerName);
+        //console.log(playerName);
 
         $("#gameInfo").empty();
-        $("#gameInfo").text("Hello: " + playerName);
+        if (isFull){
+            $("#gameInfo").text("Game Full!");
+        }
+        else{
+            var key;
+            switch(isPlayer1){
+                case true:
+                    console.log("creating player1");
+                    key = "player1";
+                    break;
+                case false:
+                    console.log("creating player2");
+                    key = "player2";
+            }
+            
+            $("#gameInfo").text("Hello: " + playerName);
 
-        var playerDataRef = database.ref('/players').child('/player1');
-        playerDataRef.set({
-            playerName: playerName,
-            score: 0
-        });
-
-        playerDataRef.onDisconnect().update({
-            score: "Offline"
-        });
-        /*
-        //TEST CODE ADJUST AS NEEDED REMOVE WHEN DONE
-        var key = database.ref().child('players').push().key
-        console.log(key);
-        var updates = {};
-        updates['players/'+key] = {username: playerName};
-        database.ref().update(updates);
-        
-        database.ref().on("value", function(snapshot) {
-            if(snapshot.child("players").exists()){
-                console.log("players exists")
-            }
-            if(snapshot.child("player1").exists()){
-                console.log("player1 exist");
-            }
-            else if(snapshot.child("players").child("player1").exists()){
-                console.log("player1 exist nested");
-            }
-            else{
-                console.log("cannot find player1");
-            }
-        });
-        //TEST CODE END*/
-
+            var playerDataRef = database.ref('/players').child(key);
+            playerDataRef.set({
+                playerName: playerName,
+                score: 0
+            });
+            //Removes player data from database when client disconnect
+            playerDataRef.onDisconnect().remove();
+        }
     });
 
     //Click event for message field submit
     $("#submitMessage").on("click", function(event){
         event.preventDefault();
-        //console.log(this);
+
         var message = $("#message").val();
         sendChatMessage(message);
 
@@ -116,13 +124,3 @@ $(function(){
     });
 });
 
-/*
-//TEMP CODE TEST CODE REMOVE WHEN DONE
-database.ref('players/player1').set({
-    username: "bob",
-});
-
-database.ref('players/player2').set({
-    username: "billy",
-});
-*/
