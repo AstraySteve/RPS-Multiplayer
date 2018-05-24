@@ -12,4 +12,15 @@
 
 #messageList{
     height: 20vh;
+    resize: none;
+}
+
+#gameArea{
+    text-align: center;
+    margin-bottom: 5vh;
+}
+
+.gameBox{
+    height: 30vh;
+    border: 2px solid red;
 }

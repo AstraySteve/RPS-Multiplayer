@@ -8,8 +8,14 @@
 var turn = 1; // Variable keep track of game phase
 var messageList = $("#messageList");
 var playerName = "";
-var isFull = false; //Flag to check if game is full
-var isPlayer1 = true;
+var makePlayer1 = true;
+var gameList = ['Rock', 'Paper', 'Scissor'];
+
+//variables to determine which player you are
+var isPlayer1 = false;
+var isPlayer2 = false;
+
+//variables Default values for waiting
 
 //Initialize Firebase
 var config = {
@@ -26,23 +32,44 @@ var database = firebase.database();
 //Listen for value events
 database.ref('/players').on('value', function(snapshot){
     //Listen event for players
-    if (snapshot.child('player1').exists() && snapshot.child('player2').exists()){
-        isFull = true;
+    if (snapshot.child('1').exists() && snapshot.child('2').exists()){
+        if (!isPlayer1 || !isPlayer2){
+            $("#gameInfo").text("Game in Session");
+        };
         console.log("game full");
-
         /* Run Game display both p1 and p2*/
+        $("#p1Name").text(snapshot.child('1').val().playerName);
+        $("#p2Name").text(snapshot.child('2').val().playerName);
+        database.ref().update({phase: 1});
+        console.log(snapshot.child('1').val().choice == null);
+        if(isPlayer1){
+            playerChoice = snapshot.child('1').val().choice;
+            opponentChoice = snapshot.child('2').val().choice
+        }
+        else if(isPlayer2){
+            playerChoice = snapshot.child('2').val().choice;
+            opponentChoice = snapshot.child('1').val().choice
+        }
+        rpsGame(playerChoice, opponentChoice);
     }
     else{
-        isFull = false;
-        if(snapshot.child('player1').exists()){
+        if(snapshot.child('1').exists()){
             /*Make Player 2 display player 1*/
-            isPlayer1 = false;
+            //console.log("making player 1")
+            makePlayer1 = false;
+            isPlayer2 = true;
+            $("#p1Name").text(snapshot.child('1').val().playerName);
+            $("#p2Name").text("Waiting for Player 2");
         }
         else {
             /*Make Player 1*/
+            makePlayer1 = true;
             isPlayer1 = true;
-            if(snapshot.child('player2').exists()){
+            if(snapshot.child('2').exists()){
                 /*display player2*/
+                //console.log("displaying player 2")
+                $("#p2Name").text(snapshot.child('2').val().playerName);
+                $("#p1Name").text("Waiting for Player 1");
             }
             else{
                 //Clears database if no players exists
@@ -68,6 +95,11 @@ database.ref('/chat').on('child_added', function(chatsnapshot){
     messageList.scrollTop(messageList[0].scrollHeight);
 });
 
+database.ref('/phase').on('value', function(phaseShot){
+    //Listen event for phase change
+    console.log(phaseShot.val());
+});
+
 //Functions
 function sendChatMessage(message){
     //Function to send messages to database, change will trigger listen 'chat' event
@@ -81,29 +113,42 @@ function sendChatMessage(message){
 function assignPlayer(){
     //Function assigns player as either player 1 or 2
     var key;
-    switch(isPlayer1){
+    switch(makePlayer1){
         case true:
-            key = "player1";
+            key = "1";
             break;
         case false:
-            key = "player2";
+            key = "2";
     }
 
-    $("#gameInfo").text("Hello: " + playerName + "you are " + key);
+    var p = $("<p>").text("Hello: " + playerName + "! you are Player" + key);
+    $("#gameInfo").append(p);
     var playerDataRef = database.ref('/players').child(key);
     playerDataRef.set({
         playerName: playerName,
         win: 0,
         loss: 0,
-        choice: ""
+        choice: null
     });
     sendChatMessage("Has joined the game.");
+
     //Removes player data from database when client disconnect
     var newPost = database.ref().child('chat').push().key;
     var updates = {};
     updates['/chat/'+newPost] = {playerName: playerName, message: "Disconnected"};
     updates['/players/'+key] = null;
     database.ref().onDisconnect().update(updates);
+}
+
+function rpsGame(playerChoice, opponentChoice){
+    //Function that holds the core game logic
+    if ((playerChoice != null) && (opponentChoice != null)){
+        //both choices have been made
+        database.ref().update({phase: 2});
+    }
+    else{
+        
+    }
 }
 
 //Main
@@ -113,7 +158,6 @@ $(function(){
     $("#addPlayer").on("click", function(){
         event.preventDefault();
         playerName = $("#playerName").val();
-        //console.log(playerName);
         $("#gameInfo").empty();
         assignPlayer();
     });
