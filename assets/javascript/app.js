@@ -9,7 +9,6 @@ var turn = 1; // Variable keep track of game phase
 var messageList = $("#messageList");
 var playerName = "";
 var makePlayer1 = true;
-var gameList = ['Rock', 'Paper', 'Scissor'];
 
 //variables to determine which player you are
 var isPlayer1 = false;
@@ -32,44 +31,52 @@ var database = firebase.database();
 //Listen for value events
 database.ref('/players').on('value', function(snapshot){
     //Listen event for players
-    if (snapshot.child('1').exists() && snapshot.child('2').exists()){
+    var p1 = snapshot.child('1');
+    var p2 = snapshot.child('2');
+    if (p1.exists() && p2.exists()){
         if (!isPlayer1 || !isPlayer2){
             $("#gameInfo").text("Game in Session");
         };
         console.log("game full");
         /* Run Game display both p1 and p2*/
-        $("#p1Name").text(snapshot.child('1').val().playerName);
-        $("#p2Name").text(snapshot.child('2').val().playerName);
+        $("#p1Name").text(p1.val().playerName);
+        $("#p1Score").text("Wins: " + p1.val().win + " Losses: " + p1.val().loss);
+        $("#p2Name").text(p2.val().playerName);
+        $("#p2Score").text("Wins: " + p2.val().win + " Losses: " + p2.val().loss);
         database.ref().update({phase: 1});
-        console.log(snapshot.child('1').val().choice == null);
+        console.log(p1.val().choice == null);
         if(isPlayer1){
-            playerChoice = snapshot.child('1').val().choice;
-            opponentChoice = snapshot.child('2').val().choice
+            playerChoice = p1.val().choice;
+            opponentChoice = p2.val().choice
         }
         else if(isPlayer2){
-            playerChoice = snapshot.child('2').val().choice;
-            opponentChoice = snapshot.child('1').val().choice
+            playerChoice = p2.val().choice;
+            opponentChoice = p1.val().choice
         }
         rpsGame(playerChoice, opponentChoice);
     }
     else{
-        if(snapshot.child('1').exists()){
+        if(p1.exists()){
             /*Make Player 2 display player 1*/
             //console.log("making player 1")
             makePlayer1 = false;
             isPlayer2 = true;
-            $("#p1Name").text(snapshot.child('1').val().playerName);
+            $("#p1Name").text(p1.val().playerName);
+            $("#p1Score").text("Wins: " + p1.val().win + " Losses: " + p1.val().loss);
             $("#p2Name").text("Waiting for Player 2");
+            $("#p2Score").empty();
         }
         else {
             /*Make Player 1*/
             makePlayer1 = true;
             isPlayer1 = true;
-            if(snapshot.child('2').exists()){
+            if(p2.exists()){
                 /*display player2*/
                 //console.log("displaying player 2")
-                $("#p2Name").text(snapshot.child('2').val().playerName);
+                $("#p2Name").text(p2.val().playerName);
+                $("#p2Score").text("Wins: " + p2.val().win + " Losses: " + p2.val().loss);
                 $("#p1Name").text("Waiting for Player 1");
+                $("#p1Score").empty();
             }
             else{
                 //Clears database if no players exists
@@ -147,6 +154,7 @@ function rpsGame(playerChoice, opponentChoice){
         database.ref().update({phase: 2});
     }
     else{
+        var gameList = ['Rock', 'Paper', 'Scissor'];
         
     }
 }
