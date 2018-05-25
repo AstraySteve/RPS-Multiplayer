@@ -4,10 +4,31 @@
     UofT SCS Coding Bootcamp
 */
 
+h5{
+    text-align: center;
+}
+
+/*Class*/
+.gameBox{
+    min-height: 30vh;
+    border: 4px inset gray;
+}
+
+.choiceZone{
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1vh;
+}
+
+/*ID*/
 #titleBar{
     text-align: center;
     border: 4px inset gray;
     margin-bottom: 3vh;
+}
+
+#mainHeader{
+    font-size: 5vh;
 }
 
 #messageList{
@@ -20,13 +41,16 @@
     margin-bottom: 5vh;
 }
 
-.gameBox{
-    min-height: 30vh;
-    border: 2px solid red;
-}
-
-.choiceZone{
-    width: 100%;
-    text-align: center;
-    margin-bottom: 1vh;
+/*Media Queries*/
+@media only screen and (max-width: 600px) {
+    #mainHeader{
+        font-size: 20px;
+    }
+    h5{
+        font-size: 15px;
+        text-align: center;
+    }
+    p{
+        font-size: 10px;
+    }
 }

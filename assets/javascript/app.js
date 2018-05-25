@@ -6,7 +6,7 @@
 
 //Global Variables
 var messageList = $("#messageList");
-var playerName = "";
+var playerName = "Annon";
 var playerNode = null;
 var makePlayer1 = true;
 var playerChoice;
@@ -146,7 +146,7 @@ function assignPlayer(){
             isPlayer2 = true;
     }
 
-    var p = $("<p>").text("Hello: " + playerName + "! you are Player" + playerNode);
+    var p = $("<h5>").text("Hello: " + playerName + "! You are Player " + playerNode);
     $("#gameInfo").append(p);
     var playerDataRef = database.ref('/players').child(playerNode);
     playerDataRef.set({
@@ -268,6 +268,7 @@ $(function(){
         loseScore = 0;
         $("#gameInfo").empty();
         assignPlayer();
+        document.getElementById("submitMessage").disabled = false;
     });
 
     //Click event for RPS buttons and updates database of choice
