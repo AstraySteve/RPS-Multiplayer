@@ -107,20 +107,19 @@ database.ref('/chat').on('child_added', function(chatsnapshot){
 
 database.ref('/phase').on('value', function(phaseShot){
     //Listen event for phase change, update scores
-    console.log(phaseShot.val());
-    //var p1Choice = playerChoice;
-    //var p2Choice = opponentChoice;
     if (phaseShot.val()==2){
         var status = compareChoice();
         database.ref('/players/'+ playerNode).update({choice : null});
         database.ref().update({phase: 1});
         if (status == 'win'){
+            winScore++;
             database.ref('/players/'+ playerNode).update({win : winScore});
-            console.log("win");
+            //console.log("win");
         }
         else if (status == "lose"){
+            loseScore++;
             database.ref('/players/'+ playerNode).update({loss : loseScore});
-            console.log('lose');
+            //console.log('lose');
         }
     }
 });
@@ -174,7 +173,7 @@ function rpsGame(){
         displayChoice();
         setTimeout(function(){
             database.ref().update({phase: 2});
-        }, 3000);
+        }, 2000);
     }
     else{      
         if(playerChoice == null && isPlayer1){
@@ -203,7 +202,7 @@ function buildButtons(player){
     for (i=0; i<gameList.length; i++){
         var button = $("<button>");
         button.attr({
-            class: "btn rpsButton",
+            class: "btn btn-block rpsButton m-1",
             'data-name': gameList[i],
         });
         button.text(gameList[i]);
@@ -217,30 +216,24 @@ function compareChoice(){
         case 'Rock':
             switch(opponentChoice){
                 case 'Scissor':
-                    winScore++;
                     return 'win';
                 case 'Paper':
-                    loseScore++;
                     return 'lose';
             }
             break;
         case 'Paper':
             switch(opponentChoice){
                 case 'Rock':
-                    winScore++;
                     return 'win';
                 case 'Scissor':
-                    loseScore++;
                     return 'lose';
             }
             break;
         case 'Scissor':
             switch(opponentChoice){
                 case 'Paper':
-                    winScore++;
                     return 'win';
                 case 'Rock':
-                    loseScore++;
                     return 'lose';
             }
             break;
@@ -260,7 +253,6 @@ function displayChoice(){
     }
     $("#p1Zone").empty();
     $("#p1Zone").html("<h5>" + p1 + "</h5>");
-
     $("#p2Zone").empty();
     $("#p2Zone").html("<h5>" + p2 + "</h5>");
 }

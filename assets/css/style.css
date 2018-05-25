@@ -21,11 +21,12 @@
 }
 
 .gameBox{
-    height: 30vh;
+    min-height: 30vh;
     border: 2px solid red;
 }
 
 .choiceZone{
     width: 100%;
     text-align: center;
+    margin-bottom: 1vh;
 }
