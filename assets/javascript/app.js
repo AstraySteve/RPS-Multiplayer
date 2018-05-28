@@ -39,7 +39,7 @@ database.ref('/players').on('value', function(snapshot){
     var p2 = snapshot.child('2');
     if (p1.exists() && p2.exists()){
         if (!isPlayer1 && !isPlayer2){
-            $("#gameInfo").html("<p>Game in Session</P>");
+            $("#gameInfo").html("<p style='text-align: center'>Game in Session</P>");
         };
         //console.log("game full");
         /* Run Game display both p1 and p2*/
